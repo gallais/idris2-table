@@ -3,14 +3,10 @@ module Data.Table.Row.Interface
 import Data.Nat
 import Data.DPair
 import Data.SnocList
+import Data.SnocList.Quantifiers
 
 import public Data.Table.Data
 import public Data.Table.Row.HasRows
-
-public export
-(++) : Table schema -> Table schema -> Table schema
-t ++ [<] = t
-t ++ (rows :< rec) = (t ++ rows) :< rec
 
 public export
 concatHasRows : (0 tbl1 : Table schema)
@@ -25,23 +21,9 @@ concatHasRows tbl1 (tbl2 :< rec) {hasRows2 = SnocTable hasRows} =
     replace {p = HasRows _} (plusSuccRightSucc _ _) $
     SnocTable (concatHasRows tbl1 tbl2)
 
--- Algebra
-
-public export
-Semigroup (Table schema) where
-    (<+>) = (++)
-
-public export
-Monoid (Table schema) where
-    neutral = [<]
-
 -- "Functor"
 
 namespace SnocList
-    public export
-    map : (Record schema -> a) -> Table schema -> SnocList a
-    map f [<] = [<]
-    map f (tbl :< rec) = map f tbl :< f rec
 
     public export
     mapPreservesLength : HasRows tbl n => HasRows tbl (length (map f tbl))
@@ -49,10 +31,6 @@ namespace SnocList
     mapPreservesLength @{SnocTable _} = SnocTable mapPreservesLength
 
 namespace Table
-    public export
-    map : (Record schema1 -> Record schema2) -> Table schema1 -> Table schema2
-    map f [<] = [<]
-    map f (tbl :< rec) = map f tbl :< f rec
 
     public export
     mapPreservesLength : HasRows tbl n => HasRows (map f tbl) n
@@ -62,36 +40,8 @@ namespace Table
 -- "Foldable"
 
 public export
-foldr : (Record schema -> a -> a) -> a -> Table schema -> a
-foldr f x [<] = x
-foldr f x (tbl :< rec) = foldr f (f rec x) tbl
-
-public export
-toSnocList : Table schema -> SnocList (Record schema)
-toSnocList [<] = [<]
-toSnocList (tbl :< rec) = toSnocList tbl :< rec
-
-public export
-elemBy : (Record schema -> Record schema -> Bool) -> Record schema -> Table schema -> Bool
-elemBy f rec tbl = elemBy f rec (toSnocList tbl)
-
-public export
-elem : Eq (Record schema) => Record schema -> Table schema -> Bool
-elem = elemBy (==)
-
--- "Monad"
-
-public export
-pure : Record schema -> Table schema
-pure rec = [<rec]
-
-public export
 pureHasRows : HasRows (pure rec) 1
 pureHasRows = SnocTable EmptyTable
-
-public export
-(>>=) : Table schema1 -> (Record schema1 -> Table schema2) -> Table schema2
-tbl >>= f = concat $ map f tbl
 
 public export
 bindHasRows : (tbl : Table schema1)

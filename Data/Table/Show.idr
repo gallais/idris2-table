@@ -11,7 +11,7 @@ import Data.Table.Row
 
 public export
 ShowField : FieldSchema -> Type
-ShowField (_ :! type) = Show type
+ShowField = Show . fieldType
 
 ||| A schema whose columns are all instances of Show
 public export
@@ -185,7 +185,7 @@ showTableBody : (allShow : ShowSchema schema)
              -> String
 -- Reconstruct the number of columns from the show instance :D
 showTableBody table =
-    let rows = replace {p = \n => SnocList (Vect n String)} (sym $ lengthAllLengthSchema allShow) $
+    let rows = replace {p = \n => SnocList (Vect n String)} (sym $ lengthUnfold allShow) $
                map showRecord table
     in formatTable {
         n = length allShow,

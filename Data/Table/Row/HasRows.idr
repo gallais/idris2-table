@@ -2,6 +2,7 @@ module Data.Table.Row.HasRows
 
 import public Data.Fin
 import public Data.Singleton
+import Data.SnocList.Quantifiers
 
 import public Data.Table.Data
 

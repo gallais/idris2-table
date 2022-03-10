@@ -1,5 +1,7 @@
 module Data.Table.Row.Aggregate
 
+import Data.SnocList
+import Data.SnocList.Quantifiers
 import public Data.SortedMap
 
 import public Data.Table.Data

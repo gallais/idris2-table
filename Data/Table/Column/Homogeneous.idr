@@ -1,6 +1,7 @@
 module Data.Table.Column.Homogeneous
 
 import public Data.SnocList
+import public Data.SnocList.Quantifiers
 
 import public Data.Table.Data
 import public Data.Table.Schema.Quantifiers

@@ -2,6 +2,7 @@ module Data.Table.Row
 
 import Data.List
 import public Data.SnocList
+import public Data.SnocList.Quantifiers
 
 import public Data.Table.Data
 import public Data.Table.Row.Aggregate
@@ -14,7 +15,7 @@ import public Data.Table.Row.Interface
 
 public export
 distinctBy : (Record schema -> Record schema -> Bool) -> Table schema -> Table schema
-distinctBy f tbl = foldl (\acc, rec => ifThenElse (elemBy f rec acc) acc (acc :< rec)) [<] $ toSnocList tbl
+distinctBy f tbl = foldl (\acc, rec => ifThenElse (elemBy f rec acc) acc (acc :< rec)) [<] tbl
 
 public export
 distinct : Eq (Record schema) => Table schema -> Table schema
@@ -64,19 +65,11 @@ findIndex rec = findIndexBy (== rec)
 
 export
 sortBy : (Record schema -> Record schema -> Ordering) -> Table schema -> Table schema
-sortBy cmp tbl = mkTable $ List.sortBy cmp (cast $ toSnocList tbl)
+sortBy cmp tbl = mkTable $ List.sortBy cmp (cast tbl)
 
 export
 sort : Ord (Record schema) => Table schema -> Table schema
 sort = sortBy compare
-
-public export
-filter : (Record schema -> Bool) -> Table schema -> Table schema
-filter f tbl = do
-    rec <- tbl
-    case f rec of
-        False => [<]
-        True => pure rec
 
 public export
 dropNa : (fld : Field schema name (Maybe type))

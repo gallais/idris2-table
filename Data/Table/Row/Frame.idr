@@ -1,5 +1,6 @@
 module Data.Table.Row.Frame
 
+import Data.SnocList
 import public Data.DPair
 
 import public Data.Table.Data

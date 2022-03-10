@@ -1,5 +1,8 @@
 module Data.Table.Schema.Data
 
+import Data.SnocList
+import Data.SnocList.Quantifiers
+
 %default total
 
 infix 10 :!
@@ -13,35 +16,21 @@ record FieldSchema where
 %name FieldSchema fs
 
 public export
-data Schema : Type where
-    Lin : Schema
-    (:<) : Schema -> FieldSchema -> Schema
+Schema : Type
+Schema = SnocList FieldSchema
 
 %name Schema schema
 
 public export
 names : Schema -> SnocList String
-names [<] = [<]
-names (schema :< (name :! type)) = names schema :< name
+names = map fieldName
 
 public export
 types : Schema -> SnocList Type
-types [<] = [<]
-types (schema :< (name :! type)) = types schema :< type
+types = map fieldType
 
 public export
-length : Schema -> Nat
-length [<] = 0
-length (schema :< _) = S (length schema)
-
-public export
-data Field : (schema : Schema) -> (name : String) -> Type -> Type where [search schema name]
-    Here : Field (schema :< (name :! type)) name type
-    There : (fld : Field schema name type) -> Field (schema :< fs) name type
+Field : (schema : Schema) -> (name : String) -> (type : Type) -> Type
+Field schema name type = Any ((name :! type) ===) schema
 
 %name Field fld
-
-public export
-(++) : Schema -> Schema -> Schema
-schema1 ++ [<] = schema1
-schema1 ++ (schema2 :< fs) = (schema1 ++ schema2) :< fs

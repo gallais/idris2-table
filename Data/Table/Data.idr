@@ -6,8 +6,7 @@ import public Data.Table.Schema
 %default total
 
 public export
-data Table : Schema -> Type where
-    Lin : Table schema
-    (:<) : Table schema -> Record schema -> Table schema
+Table : Schema -> Type
+Table schema = SnocList (Record schema)
 
 %name Table tbl

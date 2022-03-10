@@ -1,5 +1,8 @@
 module Data.Table.Row.Constructor
 
+import Data.SnocList
+import Data.SnocList.Quantifiers
+
 import public Data.Table.Data
 import public Data.Table.Row.HasRows
 import Data.Table.Row.Interface
@@ -8,10 +11,6 @@ namespace FromFoldable
     public export
     mkTable : Foldable f => f (Record schema) -> Table schema
     mkTable = foldl (:<) [<]
-
-    public export
-    (++) : Foldable f => Table schema -> f (Record schema) -> Table schema
-    (++) = foldl (:<)
 
 infixl 7 |+|
 
@@ -24,6 +23,7 @@ public export
 ([<] |+| [<]) {nrows1 = EmptyTable} {nrows2 = EmptyTable} = [<]
 ((tbl1 :< rec1) |+| (tbl2 :< rec2)) {nrows1 = SnocTable _} {nrows2 = SnocTable _} =
     (tbl1 |+| tbl2) :< (rec1 ++ rec2)
+([<] |+| (_ :< _)) {nrows2 = SnocTable _} impossible
 
 public export
 zipHasRows : (0 tbl1 : Table schema1)

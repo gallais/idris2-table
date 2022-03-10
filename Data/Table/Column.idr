@@ -1,7 +1,9 @@
 module Data.Table.Column
 
 import public Data.SnocList
+import public Data.SnocList.Quantifiers
 
+import Data.Table.Record
 import public Data.Table.Column.Homogeneous
 import public Data.Table.Data
 import public Data.Table.Row
@@ -12,7 +14,7 @@ public export
 column : Field schema name type
       -> Table schema
       -> SnocList type
-column fld tbl = map (value fld) tbl
+column fld = map (value fld)
 
 public export
 addColumn : (0 name : String)
@@ -47,10 +49,11 @@ buildColumn : (0 name : String)
            -> Table (schema :< name :! type)
 buildColumn name f tbl =
     let (_ ** _) = length tbl in
-    addColumn name (map f tbl) tbl {nRows = SnocList.mapPreservesLength}
+    let vs : ?; vs = map f tbl in
+    addColumn name vs tbl {nRows = SnocList.mapPreservesLength}
 
 public export
 dropColumn : (fld : Field schema name type)
           -> Table schema
           -> Table (drop schema fld)
-dropColumn fld tbl = mkTable $ map (dropField fld) tbl
+dropColumn fld = map (dropField fld)

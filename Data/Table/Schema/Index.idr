@@ -1,5 +1,6 @@
 module Data.Table.Schema.Index
 
+import Data.SnocList.Quantifiers
 import public Data.Table.Schema.Data
 
 %default total
@@ -16,7 +17,7 @@ data HasIndex : (schema : Schema)
              -> (fld : Field schema name type)
              -> (i : Nat)
              -> Type where [search schema i]
-    LastIndex : HasLength (schema :< (name :! type)) (S i) -> HasIndex (schema :< (name :! type)) Here i
+    LastIndex : HasLength (schema :< (name :! type)) (S i) -> HasIndex (schema :< (name :! type)) (Here Refl) i
     PrevIndex : HasIndex schema fld i -> HasIndex (schema :< fs) (There fld) i
 
 %name HasIndex idx
